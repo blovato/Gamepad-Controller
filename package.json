@@ -1,0 +1,17 @@
+{
+  "name": "gamepadcontroller",
+  "version": "1.0.0",
+  "description": "An event based api for gamepad controllers in the browser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gamepad",
+    "xbox",
+    "playstation",
+    "controller"
+  ],
+  "author": "Brenten Lovato <brentengust@gmail.com>",
+  "license": "ISC"
+}
