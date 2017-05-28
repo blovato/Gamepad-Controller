@@ -25,17 +25,6 @@ GamepadController.prototype.onGamepadConnected = function() {
   this.hasGamepad = true;
   this.previousButtonStates = Array.from({ length: 17 }, () => ({ pressed: false, value: 0 }));
   this.previousStickStates = Array.from({ length: 2 }, () => ({ x: 0, y: 0 }));
-
-  // todo move these out of here
-  this.getGamepad().buttons.forEach((button, i) => {
-    window.addEventListener('gamepad-button-press-' + i, (e) => console.log(e.detail.previous, e.detail.state, i + ' pressed'));
-    // window.addEventListener('gamepad-button-change-' + i, (e) => console.log(e.detail.previous, e.detail.state, xboxStandardButtonMap[i] + ' changed'));
-    window.addEventListener('gamepad-button-release-' + i, (e) => console.log(e.detail.previous, e.detail.state, i + ' button released'));
-  });
-  // create stick event listeners
-  window.addEventListener('gamepad-stick-change-0', (e) => console.log(e.detail.previous, e.detail.state, ' left stick changed'));
-  window.addEventListener('gamepad-stick-change-1', (e) => console.log(e.detail.previous, e.detail.state, ' right stick changed'));
-
   this.emitEventsInterval = window.setInterval(this.emitEvents.bind(this), 100);
 };
 
