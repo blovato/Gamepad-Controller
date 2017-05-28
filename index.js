@@ -11,7 +11,7 @@
       this.pollGamepadInterval = window.setInterval(this.pollForGamepad.bind(this), 500);
       // sets up structures to hold event callbacks
       this.buttonEventListeners = Array.from({length: 17}, function () {
-        return { onPress: null, onRelease: null };
+        return { onPress: null, onRelease: null, onChange: null };
       });
       this.stickEventListeners = Array.from({length: 2}, function () {
         return { onMove: null };
@@ -71,7 +71,7 @@
     GamepadController.prototype.emitButtonRelease = function (index, state) {
       this.emitButton('onRelease', index, state);
     };
-    GamepadController.prototype.emitButtonRelease = function (index, state) {
+    GamepadController.prototype.emitButtonChange = function (index, state) {
       this.emitButton('onChange', index, state);
     };
 
@@ -87,24 +87,32 @@
     GamepadController.prototype.emitEvents = function () {
       var gp = this.getGamepad();
       // button event handling
-      gp.buttons.forEach((button, i) => {
-        if (button.value > 0 && button.pressed !== this.previousButtonStates[i].pressed) {
-          this.emitButtonPress(i, {previous: this.previousButtonStates[i], state: button});
-          this.previousButtonStates[i] = {pressed: true, value: button.value};
-          return;
-        }
-        if (button.value === 0 && this.previousButtonStates[i].pressed) {
-          this.emitButtonRelease(i, {previous: this.previousButtonStates[i], state: button});
-          this.previousButtonStates[i] = {pressed: false, value: button.value};
-        }
-      });
+      gp.buttons
+        .map(function (button) {
+          return { pressed: button.pressed, value: this.applyDeadzone(button.value) };
+        }.bind(this))
+        .forEach(function (button, i) {
+          if (this.previousButtonStates[i].value > 0 && button.value !== this.previousButtonStates[i].value) {
+            this.emitButtonChange(i, { previous: this.previousButtonStates[i], current: button });
+            this.previousButtonStates[i] = { pressed: true, value: button.value };
+          }
+          if (button.value > 0 && button.pressed !== this.previousButtonStates[i].pressed) {
+            this.emitButtonPress(i, { previous: this.previousButtonStates[i], current: button });
+            this.previousButtonStates[i] = { pressed: true, value: button.value };
+            return;
+          }
+          if (button.value === 0 && this.previousButtonStates[i].pressed) {
+            this.emitButtonRelease(i, { previous: this.previousButtonStates[i], current: button });
+            this.previousButtonStates[i] = { pressed: false, value: button.value };
+          }
+        }.bind(this));
       // stick event handling
-      this.transformAxesToStick(gp.axes).forEach((stick, i) => {
+      this.transformAxesToStick(gp.axes).forEach(function (stick, i) {
         if (stick.x !== this.previousStickStates[i].x || stick.y !== this.previousStickStates[i].y) {
-          this.emitStickMove(i, {previous: this.previousStickStates[i], state: stick});
+          this.emitStickMove(i, { previous: this.previousStickStates[i], current: stick });
           this.previousStickStates[i] = stick;
         }
-      });
+      }.bind(this));
     };
 
     GamepadController.prototype.onButtonPress = function (index, cb) {
@@ -112,6 +120,13 @@
     };
     GamepadController.prototype.removeOnButtonPress = function (index) {
       this.buttonEventListeners[index].onPress = null;
+    };
+
+    GamepadController.prototype.onButtonChange = function (index, cb) {
+      this.buttonEventListeners[index].onChange = cb;
+    };
+    GamepadController.prototype.removeOnButtonChange = function (index) {
+      this.buttonEventListeners[index].onChange = null;
     };
 
     GamepadController.prototype.onButtonRelease = function (index, cb) {
