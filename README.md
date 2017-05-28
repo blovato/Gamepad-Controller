@@ -9,7 +9,7 @@ Install with:
 
 Then on the client:
 
-```
+```js
 // ES6
 import 'GamepadController' from 'gamepad-controller';
 // OR ES5
