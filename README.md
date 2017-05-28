@@ -5,31 +5,51 @@ Facilitates listening to button press, button release, and joy stick move events
 
 ## Usage
 Install with:
-`$ npm install --save gamepad-controller`
+`$ npm install --save gamepadcontroller`
 
 Then on the client:
 
 ```js
 // ES6
-import 'GamepadController' from 'gamepad-controller';
+import 'GamepadController' from 'gamepadcontroller';
 // OR ES5
-var GamepadController = require('gamepad-controller');
+var GamepadController = require('gamepadcontroller');
 
 const gamepad = new GamepadController(0 /* takes an index, 0 - 3  */);
 gamepad.onButtonPress(0, e => console.log(e, 'A button pressed'));
 gamepad.onButtonRelease(0, e => console.log(e, 'A button released'));
+gamepad.onButtonChange(7, e => console.log(e, 'Right trigger changed'));
 gamepad.onStickMove(0, e => console.log(e, 'Left stick moved'));
 ```
 The `GamepadController` constructor requires an index from 0 - 3 to determine which of the four potential gamepad controller slots to wrap. 
 
 ### Event Listeners
+#### Button Events
 
-* `gamepad.onButtonPress(buttonIndex, callbackFunction)`
+* `gamepad.onButtonPress(buttonIndex, buttonCallbackFunction)`
 * `gamepad.removeOnButtonPress(buttonIndex)`
-* `gamepad.onButtonRelease(buttonIndex, callbackFunction)`
+* `gamepad.onButtonRelease(buttonIndex, buttonCallbackFunction)`
 * `gamepad.removeOnButtonRelease(buttonIndex)`
-* `gamepad.onStickMove(stickIndex, callbackFunction)`
+* `gamepad.onButtonChange(buttonIndex, buttonCallbackFunction)`
+* `gamepad.removeOnButtonChange(buttonIndex)`
+```js
+function buttonCallbackFunction (state) {
+  const { previous, current } = state;
+  // previous and current = { pressed: Bool, value: 0 < value < 1 } 
+  // handle button event ...
+}
+```
+
+#### Stick Events
+* `gamepad.onStickMove(stickIndex, stickCallbackFunction)`
 * `gamepad.removeOnStickMove(stickIndex)`
+```js
+function stickCallbackFunction (state) {
+  const { previous, current } = state;
+  // previous and current = { x: -1 < x < 1, y: -1 < y < 1 }
+  // handle stick move ...
+}
+```
 
 ### Reference
 
