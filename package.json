@@ -1,6 +1,6 @@
 {
   "name": "gamepadcontroller",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An event based api for gamepad controllers in the browser",
   "main": "index.js",
   "scripts": {
