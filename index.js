@@ -35,14 +35,17 @@ GamepadController.prototype.onGamepadDisconnected = function() {
 
 GamepadController.prototype.applyDeadzone = function(number) {
   var threshold = 0.25;
-  percentage = (Math.abs(number) - threshold) / (1 - threshold);
+  var percentage = (Math.abs(number) - threshold) / (1 - threshold);
   if (percentage < 0) percentage = 0;
   return percentage * (number > 0 ? 1 : -1);
 };
 
 GamepadController.prototype.transformAxesToStick = function(axes) {
-  var axes = axes.map(axis => this.applyDeadzone(axis));
-  return [{ x: axes[0], y: -1 * axes[1] }, { x: axes[2], y: -1 * axes[3] }];
+  var axesMod = axes.map(axis => this.applyDeadzone(axis));
+  return [
+    { x: axesMod[0], y: -1 * axesMod[1] },
+    { x: axesMod[2], y: -1 * axesMod[3] }
+  ];
 };
 
 GamepadController.prototype.emitButton = function(key, index, state) {
